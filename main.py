@@ -33,8 +33,8 @@ def sedang(x,nilai_fuzzy): # Variabel linguistik
 def tinggi(x,nilai_fuzzy): # Variabel linguistik
     a = 10.0
     b = 13.0
-    c = 20 # lebih dari nilai maksimum penghasilan data mahasiswa agar tidak 0
-    d = 20 # lebih dari nilai maksimum penghasilan data mahasiswa agar tidak 0
+    c = 20 # c lebih dari nilai maksimum penghasilan agar tidak 0
+    d = 20 # d lebih dari nilai maksimum penghasilan agar tidak 0
     nilai_fuzzy['tinggi'] = round(trapesium(x,a,b,c,d),2)
 
     return nilai_fuzzy
@@ -69,8 +69,8 @@ def banyak(x,nilai_fuzzy): # Variabel linguistik
 def sangat_banyak(x,nilai_fuzzy): # Variabel linguistik
     a = 6.0
     b = 8.0
-    c = 12.0 # lebih dari nilai maksimum pengeluaran data mahasiswa agar tidak 0
-    d = 12.0 # lebih dari nilai maksimum pengeluaran data mahasiswa agar tidak 0
+    c = 12.0 # c dari nilai maksimum pengeluaran agar tidak 0
+    d = 12.0 # d dari nilai maksimum pengeluaran agar tidak 0
     nilai_fuzzy['sangat_banyak'] = round(trapesium(x,a,b,c,d),2)
 
     return nilai_fuzzy
@@ -147,21 +147,22 @@ def inference(nilai_pengeluaran,nilai_penghasilan):
 
     # Disjunction
     for i in nilai_kelayakan: 
-        if (nilai_kelayakan[i]['ditolak']==[]): # Fill empty value
+         # Mengisi nilai 0 pada array kosong
+        if (nilai_kelayakan[i]['ditolak']==[]):
             nilai_kelayakan[i]['ditolak'] = [0]
-        elif(nilai_kelayakan[i]['diterima']==[]): # Fill empty value
+        elif(nilai_kelayakan[i]['diterima']==[]):
             nilai_kelayakan[i]['diterima'] = [0]
-
+    
         nilai_kelayakan[i]['diterima'] = max(nilai_kelayakan[i]['diterima'])
         nilai_kelayakan[i]['ditolak'] = max(nilai_kelayakan[i]['ditolak'])
 
     return nilai_kelayakan
 
-# def defuzzification(nilai_kelayakan):
-#     return 
-
-# def rumus(l, tl):
-#     return ((tl * 35) + (l * 70)) / (tl + l)
+def defuzzification(nilai_kelayakan):
+    hasil = {}
+    for i in nilai_kelayakan:
+        hasil[i] = (nilai_kelayakan[i]['ditolak'] * 40) + (nilai_kelayakan[i]['diterima'] * 70) / (nilai_kelayakan[i]['ditolak'] + nilai_kelayakan[i]['diterima'])
+    return hasil
 
 if __name__=="__main__":
     data_mahasiswa = pd.read_excel('./Mahasiswa.xls')
@@ -170,7 +171,11 @@ if __name__=="__main__":
     
     nilai_pengeluaran, nilai_penghasilan = fuzzification(pengeluaran, penghasilan)
     nilai_kelayakan = inference(nilai_pengeluaran,nilai_penghasilan)
-    #hasil = defuzzification(nilai_kelayakan)
+    hasil = defuzzification(nilai_kelayakan)
+
+    layak_beasiswa = sorted(hasil.items(),key=lambda x: x[1])
+    
+    print(layak_beasiswa[-20:])
     
     
     
