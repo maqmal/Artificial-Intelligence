@@ -99,50 +99,69 @@ def fuzzification(pengeluaran,penghasilan):
 def inference(nilai_pengeluaran,nilai_penghasilan):
     nilai_kelayakan = {}
     i = 1
-    while i <=100:
+    # Conjuction
+    while i <=100: 
         layak = {}
+        diterima = []
+        ditolak = []
         if ((nilai_penghasilan[i]['rendah']!=0) and (nilai_pengeluaran[i]['sedikit']!=0)):
-            layak['diterima'] = min(nilai_penghasilan[i]['rendah'],nilai_pengeluaran[i]['sedikit'])
+            diterima.append(min(nilai_penghasilan[i]['rendah'],nilai_pengeluaran[i]['sedikit']))
 
         if ((nilai_penghasilan[i]['rendah']!=0) and (nilai_pengeluaran[i]['cukup']!=0)):
-            layak['diterima'] = min(nilai_penghasilan[i]['rendah'],nilai_pengeluaran[i]['cukup'])
+            diterima.append(min(nilai_penghasilan[i]['rendah'],nilai_pengeluaran[i]['cukup']))
 
         if ((nilai_penghasilan[i]['rendah']!=0) and (nilai_pengeluaran[i]['banyak']!=0)):
-            layak['diterima'] = min(nilai_penghasilan[i]['rendah'],nilai_pengeluaran[i]['banyak'])
+            diterima.append(min(nilai_penghasilan[i]['rendah'],nilai_pengeluaran[i]['banyak']))
 
         if ((nilai_penghasilan[i]['rendah']!=0) and (nilai_pengeluaran[i]['sangat_banyak']!=0)):
-            layak['diterima'] = min(nilai_penghasilan[i]['rendah'],nilai_pengeluaran[i]['sangat_banyak'])
+            diterima.append(min(nilai_penghasilan[i]['rendah'],nilai_pengeluaran[i]['sangat_banyak']))
 
         if ((nilai_penghasilan[i]['sedang']!=0) and (nilai_pengeluaran[i]['sedikit']!=0)):
-            layak['diterima'] = min(nilai_penghasilan[i]['sedang'],nilai_pengeluaran[i]['sedikit'])
+            diterima.append(min(nilai_penghasilan[i]['sedang'],nilai_pengeluaran[i]['sedikit']))
 
         if ((nilai_penghasilan[i]['sedang']!=0) and (nilai_pengeluaran[i]['cukup']!=0)):
-            layak['diterima'] = min(nilai_penghasilan[i]['sedang'],nilai_pengeluaran[i]['cukup'])
+            diterima.append(min(nilai_penghasilan[i]['sedang'],nilai_pengeluaran[i]['cukup']))
 
         if ((nilai_penghasilan[i]['sedang']!=0) and (nilai_pengeluaran[i]['banyak']!=0)):
-            layak['ditolak'] = min(nilai_penghasilan[i]['sedang'],nilai_pengeluaran[i]['banyak'])
+            ditolak.append(min(nilai_penghasilan[i]['sedang'],nilai_pengeluaran[i]['banyak']))
 
         if ((nilai_penghasilan[i]['sedang']!=0) and (nilai_pengeluaran[i]['sangat_banyak']!=0)):
-            layak['ditolak'] = min(nilai_penghasilan[i]['sedang'],nilai_pengeluaran[i]['sangat_banyak'])
+            ditolak.append(min(nilai_penghasilan[i]['sedang'],nilai_pengeluaran[i]['sangat_banyak']))
 
         if ((nilai_penghasilan[i]['tinggi']!=0) and (nilai_pengeluaran[i]['sedikit']!=0)):
-            layak['ditolak'] = min(nilai_penghasilan[i]['tinggi'],nilai_pengeluaran[i]['sedikit'])
+            ditolak.append(min(nilai_penghasilan[i]['tinggi'],nilai_pengeluaran[i]['sedikit']))
 
         if ((nilai_penghasilan[i]['tinggi']!=0) and (nilai_pengeluaran[i]['cukup']!=0)):
-            layak['ditolak'] = min(nilai_penghasilan[i]['tinggi'],nilai_pengeluaran[i]['cukup'])
+            ditolak.append(min(nilai_penghasilan[i]['tinggi'],nilai_pengeluaran[i]['cukup']))
 
         if ((nilai_penghasilan[i]['tinggi']!=0) and (nilai_pengeluaran[i]['banyak']!=0)):
-            layak['ditolak'] = min(nilai_penghasilan[i]['tinggi'],nilai_pengeluaran[i]['banyak'])
+            ditolak.append(min(nilai_penghasilan[i]['tinggi'],nilai_pengeluaran[i]['banyak']))
 
         if ((nilai_penghasilan[i]['tinggi']!=0) and (nilai_pengeluaran[i]['sangat_banyak']!=0)):
-            layak['diterima'] = min(nilai_penghasilan[i]['tinggi'],nilai_pengeluaran[i]['sangat_banyak'])
-        
+            diterima.append(min(nilai_penghasilan[i]['tinggi'],nilai_pengeluaran[i]['sangat_banyak']))
+
+        layak['diterima'] = diterima
+        layak['ditolak'] = ditolak
         nilai_kelayakan[i] = layak
         i+=1
+
+    # Disjunction
+    for i in nilai_kelayakan: 
+        if (nilai_kelayakan[i]['ditolak']==[]): # Fill empty value
+            nilai_kelayakan[i]['ditolak'] = [0]
+        elif(nilai_kelayakan[i]['diterima']==[]): # Fill empty value
+            nilai_kelayakan[i]['diterima'] = [0]
+
+        nilai_kelayakan[i]['diterima'] = max(nilai_kelayakan[i]['diterima'])
+        nilai_kelayakan[i]['ditolak'] = max(nilai_kelayakan[i]['ditolak'])
+
     return nilai_kelayakan
 
-def defuzzification(nilai_kelayakan):
-    
+# def defuzzification(nilai_kelayakan):
+#     return 
+
+# def rumus(l, tl):
+#     return ((tl * 35) + (l * 70)) / (tl + l)
 
 if __name__=="__main__":
     data_mahasiswa = pd.read_excel('./Mahasiswa.xls')
@@ -151,7 +170,7 @@ if __name__=="__main__":
     
     nilai_pengeluaran, nilai_penghasilan = fuzzification(pengeluaran, penghasilan)
     nilai_kelayakan = inference(nilai_pengeluaran,nilai_penghasilan)
-    hasil = defuzzification(nilai_kelayakan)
-    print(hasil)
+    #hasil = defuzzification(nilai_kelayakan)
+    
     
     
