@@ -12,6 +12,16 @@ def trapesium(x,a,b,c,d): # Fungsi keanggotaan trapesium
 
     return nilai
 
+def segitiga(x,a,b,c):
+    if ((x<=a) or (x>=c)):
+        nilai = 0
+    elif ((x>a) and (x<=b)):
+        nilai = (x-a)/(b-a)
+    elif ((x>b) and (x<=c)):
+        nilai = -(x-c)/(c-b)
+
+    return nilai
+
 def rendah(x,nilai_fuzzy): # Variabel linguistik
     a = 0.0
     b = 0.0
@@ -24,9 +34,8 @@ def rendah(x,nilai_fuzzy): # Variabel linguistik
 def sedang(x,nilai_fuzzy): # Variabel linguistik
     a = 5.0
     b = 8.0
-    c = 10.0
-    d = 13.0
-    nilai_fuzzy['sedang'] = round(trapesium(x,a,b,c,d),2)
+    c = 13.0
+    nilai_fuzzy['sedang'] = round(segitiga(x,a,b,c),2)
     
     return nilai_fuzzy
 
@@ -158,10 +167,17 @@ def inference(nilai_pengeluaran,nilai_penghasilan):
 
     return nilai_kelayakan
 
-def defuzzification(nilai_kelayakan):
+def defuzzification(nilai_kelayakan): # Center of Gravity dengan rentang nilai kelayakan [0..100]
     hasil = {}
     for i in nilai_kelayakan:
-        hasil[i] = (nilai_kelayakan[i]['ditolak'] * 40) + (nilai_kelayakan[i]['diterima'] * 70) / (nilai_kelayakan[i]['ditolak'] + nilai_kelayakan[i]['diterima'])
+        if ((nilai_kelayakan[i]['diterima'] !=0) and (nilai_kelayakan[i]['ditolak'] == 0)):
+            temp = (60*((60-50)/(80-50))) + (65*((65-50)/(80-50))) +(70+80)*nilai_kelayakan[i]['diterima']
+            hasil[i] = round(temp/((60-50)/(80-50))+((65-50)/(80-50))+(nilai_kelayakan[i]['diterima']*2),2)
+        elif ((nilai_kelayakan[i]['ditolak'] !=0) and (nilai_kelayakan[i]['diterima'] == 0)):
+            temp = (10+20+30+40+50)*nilai_kelayakan[i]['ditolak'] + (60*(-(60-80)/(80-50))) + (65*(-(65-80)/(80-50))) + (70*(-(70-80)/(80-50)))
+            hasil[i] = round(temp/(-(60-80)/(80-50))+(-(65-80)/(80-50))+(nilai_kelayakan[i]['ditolak']*5),2)
+        else:
+            hasil[i] = round(((10+20+30+40+50+60)*nilai_kelayakan[i]['ditolak']) + ((70+80+90+100)*nilai_kelayakan[i]['diterima']) / (6*(nilai_kelayakan[i]['ditolak'])) + (4*(nilai_kelayakan[i]['diterima'])),2)
     return hasil
 
 if __name__=="__main__":
@@ -169,13 +185,26 @@ if __name__=="__main__":
     penghasilan = pd.DataFrame(data_mahasiswa, columns=['Penghasilan'])
     pengeluaran = pd.DataFrame(data_mahasiswa, columns=['Pengeluaran'])
     
-    nilai_pengeluaran, nilai_penghasilan = fuzzification(pengeluaran, penghasilan)
-    nilai_kelayakan = inference(nilai_pengeluaran,nilai_penghasilan)
-    hasil = defuzzification(nilai_kelayakan)
+    nilai_pengeluaran, nilai_penghasilan = fuzzification(pengeluaran, penghasilan) # Fuzzification
+    nilai_kelayakan = inference(nilai_pengeluaran,nilai_penghasilan) # Inference
+    hasil = defuzzification(nilai_kelayakan) # Defuzzification
 
     layak_beasiswa = sorted(hasil.items(),key=lambda x: x[1])
+
+    print(layak_beasiswa)
+
+    # Buat excel
+    excel = []
+    for i in range(len(layak_beasiswa)):
+        excel.append(layak_beasiswa[i][0])
+    myexcel = []
+    for i in reversed(excel[-20:]):
+        myexcel.append(i)
+    df = pd.DataFrame(myexcel)
+    df.to_excel("Bantuan.xls",index=False,header=False)
+
     
-    print(layak_beasiswa[-20:])
+    
     
     
     
