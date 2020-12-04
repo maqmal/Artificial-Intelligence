@@ -96,6 +96,6 @@ if __name__ == "__main__":
     plt.xlabel('Generasi')
     plt.ylabel('BEST Fitness')
     plt.plot(x,y)
-    plt.savefig("best.png")
+    plt.savefig("graph/best.png")
 
     
