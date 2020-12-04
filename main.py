@@ -34,7 +34,7 @@ def rendah(x,nilai_fuzzy): # Variabel linguistik
 def sedang(x,nilai_fuzzy): # Variabel linguistik
     a = 5.0
     b = 8.0
-    c = 13.0
+    c = 11.0
     nilai_fuzzy['sedang'] = round(segitiga(x,a,b,c),2)
     
     return nilai_fuzzy
@@ -42,8 +42,8 @@ def sedang(x,nilai_fuzzy): # Variabel linguistik
 def tinggi(x,nilai_fuzzy): # Variabel linguistik
     a = 10.0
     b = 13.0
-    c = 20 # c lebih dari nilai maksimum penghasilan agar tidak 0
-    d = 20 # d lebih dari nilai maksimum penghasilan agar tidak 0
+    c = 99.0 # c lebih dari nilai maksimum penghasilan agar tidak 0
+    d = 99.0 # d lebih dari nilai maksimum penghasilan agar tidak 0
     nilai_fuzzy['tinggi'] = round(trapesium(x,a,b,c,d),2)
 
     return nilai_fuzzy
@@ -51,35 +51,33 @@ def tinggi(x,nilai_fuzzy): # Variabel linguistik
 def sedikit(x,nilai_fuzzy): # Variabel linguistik
     a = 0.0
     b = 0.0
-    c = 2.0
-    d = 3.0
+    c = 3.0
+    d = 4.0
     nilai_fuzzy['sedikit'] = round(trapesium(x,a,b,c,d),2)
 
     return nilai_fuzzy
 
 def cukup(x,nilai_fuzzy): # Variabel linguistik
-    a = 2.0
-    b = 3.0
-    c = 4.0
-    d = 5.0
-    nilai_fuzzy['cukup'] = round(trapesium(x,a,b,c,d),2)
+    a = 3.0
+    b = 4.0
+    c = 6.0
+    nilai_fuzzy['cukup'] = round(segitiga(x,a,b,c),2)
 
     return nilai_fuzzy
 
 def banyak(x,nilai_fuzzy): # Variabel linguistik
-    a = 4.0
-    b = 5.0
-    c = 6.0
-    d = 8.0
-    nilai_fuzzy['banyak'] = round(trapesium(x,a,b,c,d),2)
+    a = 5.0
+    b = 6.0
+    c = 8.0
+    nilai_fuzzy['banyak'] = round(segitiga(x,a,b,c),2)
 
     return nilai_fuzzy
 
 def sangat_banyak(x,nilai_fuzzy): # Variabel linguistik
-    a = 6.0
-    b = 8.0
-    c = 12.0 # c dari nilai maksimum pengeluaran agar tidak 0
-    d = 12.0 # d dari nilai maksimum pengeluaran agar tidak 0
+    a = 7.0
+    b = 12.0
+    c = 99.0 # c dari nilai maksimum pengeluaran agar tidak 0
+    d = 99.0 # d dari nilai maksimum pengeluaran agar tidak 0
     nilai_fuzzy['sangat_banyak'] = round(trapesium(x,a,b,c,d),2)
 
     return nilai_fuzzy
@@ -126,16 +124,16 @@ def inference(nilai_pengeluaran,nilai_penghasilan):
             diterima.append(min(nilai_penghasilan[i]['rendah'],nilai_pengeluaran[i]['sangat_banyak']))
 
         if ((nilai_penghasilan[i]['sedang']!=0) and (nilai_pengeluaran[i]['sedikit']!=0)):
-            diterima.append(min(nilai_penghasilan[i]['sedang'],nilai_pengeluaran[i]['sedikit']))
+            ditolak.append(min(nilai_penghasilan[i]['sedang'],nilai_pengeluaran[i]['sedikit']))
 
         if ((nilai_penghasilan[i]['sedang']!=0) and (nilai_pengeluaran[i]['cukup']!=0)):
-            diterima.append(min(nilai_penghasilan[i]['sedang'],nilai_pengeluaran[i]['cukup']))
+            ditolak.append(min(nilai_penghasilan[i]['sedang'],nilai_pengeluaran[i]['cukup']))
 
         if ((nilai_penghasilan[i]['sedang']!=0) and (nilai_pengeluaran[i]['banyak']!=0)):
             ditolak.append(min(nilai_penghasilan[i]['sedang'],nilai_pengeluaran[i]['banyak']))
 
         if ((nilai_penghasilan[i]['sedang']!=0) and (nilai_pengeluaran[i]['sangat_banyak']!=0)):
-            ditolak.append(min(nilai_penghasilan[i]['sedang'],nilai_pengeluaran[i]['sangat_banyak']))
+            diterima.append(min(nilai_penghasilan[i]['sedang'],nilai_pengeluaran[i]['sangat_banyak']))
 
         if ((nilai_penghasilan[i]['tinggi']!=0) and (nilai_pengeluaran[i]['sedikit']!=0)):
             ditolak.append(min(nilai_penghasilan[i]['tinggi'],nilai_pengeluaran[i]['sedikit']))
@@ -156,7 +154,7 @@ def inference(nilai_pengeluaran,nilai_penghasilan):
 
     # Disjunction
     for i in nilai_kelayakan: 
-         # Mengisi nilai 0 pada array kosong
+        #  # Mengisi nilai 0 pada array kosong
         if (nilai_kelayakan[i]['ditolak']==[]):
             nilai_kelayakan[i]['ditolak'] = [0]
         elif(nilai_kelayakan[i]['diterima']==[]):
@@ -191,9 +189,9 @@ if __name__=="__main__":
 
     layak_beasiswa = sorted(hasil.items(),key=lambda x: x[1])
 
-    print(layak_beasiswa)
+    print(nilai_kelayakan)
 
-    # Buat excel
+    #Buat excel
     excel = []
     for i in range(len(layak_beasiswa)):
         excel.append(layak_beasiswa[i][0])
